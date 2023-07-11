@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 
+
 monthlyChallenges = {
     'jan': 'eat more meat',
     'feb': 'study more comp sci',
