@@ -1,28 +1,28 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
+from django.forms.models import model_to_dict # alternative to serializer
 from django.urls import reverse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
+from rest_framework import status, permissions
+from rest_framework.decorators import api_view
 
 from .models import Book
 from .serializers import BookSerializer
 
 # Create your views here.
-
+# class views
 class BookListApiView(APIView):
    # add permission to check if user is authenticated
     permission_classes = [permissions.IsAuthenticated]
 
-    # 1. List all books
+    # 1. List all books by user
     def get(self, request, *args, **kwargs):
-        '''
-        List all the book items for given requested user
-        '''
         books = Book.objects.filter(user = request.user.id)
-        booksSerialized = BookSerializer(books, many=True)
-        return Response(booksSerialized.data, status=status.HTTP_200_OK)
+#         books = model_to_dict(books) # like serializer but not as flexible;
+#         return Response(books, status=status.HTTP_200_OK) # must use JsonResponse
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         # assemble data package
@@ -33,10 +33,13 @@ class BookListApiView(APIView):
             'user': request.user.id
         }
 
-        booksSerialized = BookSerializer(data=data)
-        if booksSerialized.is_valid():
-            booksSerialized.save()
-            return Response(booksSerialized.data, status=status.HTTP_201_CREATED)
+        serializer = BookSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+#             instance = serializer.save() # create an instance
+#             instance = form.save() # create an instance
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(booksSerialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,18 +104,30 @@ class BookDetailApiView(APIView):
         )
 
 
+# standard controller
+def index(request):
+    books = Book.objects.all()
+    serializer = BookSerializer(books, many=True)
+    print('serializer: : ', serializer.data)
+    return JsonResponse({'books': serializer.data })
+
+@api_view(['POST']) # make this into a DRF view
+def api_home(request):
+#     data = request.data
+#     print(data)
+#     return Response(data)
+    serializer = BookSerializer(data=request.data)
+    if serializer.is_valid():
+        instance = serializer.save() # return obj class of models
+#           instance = form.save() # similar
+        print("instance: ", instance)
+
+        return Response(serializer.data) # can't return instance since it cannot be serialized
+
+    return Response({'invalid': 'not good data'}, status=400)
 
 
-
-
-# this is left over
-# def index(request):
-
+# left overs
 #     if month in monthlyChallenges:
 #         return JsonResponse({'challenge': monthlyChallenges[month]})
 #         return HttpResponse(f'Your challenge for {month} is: {monthlyChallenges[month]}')
-#     books = Book.objects.all()
-#     booksSerialized = BookSerializer(books, many=True)
-#     print('books serialized: ', booksSerialized.data)
-#     return JsonResponse({'books': booksSerialized.data })
-
