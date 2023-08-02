@@ -1,15 +1,38 @@
 from rest_framework import serializers
-from .models import Book
+from .models import Book, Library
+from .validators import validate_title
+from . import validators
 
-class BookSerializer(serializers.ModelSerializer):
-    my_discount = serializers.SerializerMethodField(read_only=True)
+
+class AllocationSerializer(serializers.ModelSerializer):
+    # custom validation checks
+
+    # timerTotalTime = # this would be a calculated field done here
+
     class Meta:
         model = Book
-        fields = ['title', 'author', 'rating', 'is_bestselling', 'user', 'my_discount']
+        fields = ['developer', 'date', 'time', 'comment', 'timerTotalTime']
 
-    def get_my_discount(self, obj):
-        if not hasattr(obj, 'id'):
-            return None
-        if not isinstance(obj, Book):
-            return None
-        return obj.get_discount()
+
+class BookSerializer(serializers.ModelSerializer):
+    # custom validation checks
+    title = serializers.CharField(validators=[validate_title])  # uses a custom validator
+    title = serializers.CharField(
+        validators=[validators.unique_book_title, validators.validate_no_hello])  # use my 2 custom validators
+    author = serializers.CharField(validators=[validators.validate_no_hello])  # reuse my custom validator
+
+    class Meta:
+        model = Book
+        fields = ['title', 'author', 'rating', 'is_bestselling', 'file']
+
+class TitleSearchSerializer(serializers.ModelSerializer):
+    # find book with title
+
+    class Meta:
+        model = Book
+        fields = ['title']
+class LibrarySerializer(serializers.ModelSerializer):
+    # optional custom validators here
+    class Meta:
+        model = Library
+        fields = ['name', 'city', 'short', 'file']
