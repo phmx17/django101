@@ -22,7 +22,8 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path("challenges/", include('django101app.urls')),
-    path("books/", include('book_outlet_app.urls')),
+    # books api
+    path("api/books/", include('book_outlet_app.urls')),
+    # path("challenges/", include('django101app.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
