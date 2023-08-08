@@ -115,28 +115,28 @@ class BookDetailApiView(APIView):
         )
 
 
-# standard controller
-@api_view(['GET'])
-def index(request):
-    books = Book.objects.all()
-    serializer = BookSerializer(books, many=True)
-    # print('serializer: : ', serializer.data)
-    return Response({'books': serializer.data})
+# standard controllers
+# @api_view(['GET'])
+# def index(request):
+#     books = Book.objects.all()
+#     serializer = BookSerializer(books, many=True)
+#     # print('serializer: : ', serializer.data)
+#     return Response({'books': serializer.data})
 
 
-@api_view(['POST'])  # make this into a DRF view
-def api_home(request):
-    print("request method", request.method)
-    serializer = BookSerializer(data=request.data)
-    if serializer.is_valid(
-            raise_exception=True):  # raise_exception will return detailed error like "...this field is required"
-        #         instance = serializer.save() # return obj class of models; use the instance for ingesting data
-        #         instance = form.save() # similar
-        # print("serializer is valid. Title to be saved:", request.data['title'])
-        serializer.save()
-        return Response(serializer.data)  # can't return instance since it cannot be serialized
-
-    return Response({'invalid': 'not good data'}, status=400)
+# @api_view(['POST'])  # make this into a DRF view
+# def api_home(request):
+#     print("request method", request.method)
+#     serializer = BookSerializer(data=request.data)
+#     if serializer.is_valid(
+#             raise_exception=True):  # raise_exception will return detailed error like "...this field is required"
+#         #         instance = serializer.save() # return obj class of models; use the instance for ingesting data
+#         #         instance = form.save() # similar
+#         # print("serializer is valid. Title to be saved:", request.data['title'])
+#         serializer.save()
+#         return Response(serializer.data)  # can't return instance since it cannot be serialized
+#
+#     return Response({'invalid': 'not good data'}, status=400)
 
 # Search
 @api_view(['POST'])

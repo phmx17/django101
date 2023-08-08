@@ -41,20 +41,27 @@ INSTALLED_APPS = [
     "django101app",
     "book_outlet_app",
     "rest_framework",
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    "corsheaders",
 
 ]
 
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+]
 ROOT_URLCONF = "django101.urls"
 
 TEMPLATES = [
