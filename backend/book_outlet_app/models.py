@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 class Library(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
     short = models.CharField(max_length=4, unique=True)
     inventory = models.ForeignKey('Book', null=True, related_name='books', on_delete=models.PROTECT)
 
@@ -19,9 +20,9 @@ class Library(models.Model):
 
 
 class Book(models.Model):
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=100, unique=True)
     rating = models.IntegerField(
-        null=True,
+        null=True, blank=True,
         validators=[MinValueValidator(1), MaxValueValidator(5)],
     )
     author = models.CharField(blank=True,
@@ -29,12 +30,8 @@ class Book(models.Model):
     is_bestselling = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     file = models.FileField(null=True, blank=True)
-    library = models.ForeignKey(Library, null=True, related_name='books', on_delete=models.PROTECT)
+    library = models.ForeignKey(Library, null=True, blank=True, related_name='books', on_delete=models.PROTECT)
     countries = models.ManyToManyField('Country')
-
-    # custom return
-    def title_and_author(self):
-        return f"{self.title} by {self.author}"
 
     # to string method
     def __str__(self):
@@ -43,7 +40,7 @@ class Book(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=100)
-    region = models.CharField(max_length=20, blank=True)
+    region = models.CharField(max_length=30, blank=True, null=True)
 
     def __str__(self):
         return self.name

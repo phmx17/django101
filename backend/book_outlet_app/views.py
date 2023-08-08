@@ -10,12 +10,23 @@ from django.shortcuts import get_object_or_404 # great shortcut
 
 # get user model
 from django.contrib.auth import get_user_model
-
 from .models import Book
 from .serializers import BookSerializer
 
+# JWT auth
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 # Create your views here.
+# JWT authorization views
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token['username'] = user.name
+        return token
 
 
 # ListApiView;  this could be rolled into the CreateApiView
@@ -43,9 +54,6 @@ class BookListApiView(APIView):
         serializer = BookSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            #             instance = serializer.save() # create an instance
-            #             instance = form.save() # create an instance
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -108,11 +116,12 @@ class BookDetailApiView(APIView):
 
 
 # standard controller
+@api_view(['GET'])
 def index(request):
     books = Book.objects.all()
     serializer = BookSerializer(books, many=True)
     # print('serializer: : ', serializer.data)
-    return JsonResponse({'books': serializer.data})
+    return Response({'books': serializer.data})
 
 
 @api_view(['POST'])  # make this into a DRF view
