@@ -2,11 +2,11 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, JsonResponse, HttpRequest
 from django.forms.models import model_to_dict  # alternative to serializer
 from django.urls import reverse
-from rest_framework.views import APIView # class views
-from rest_framework.decorators import api_view # @decorator
-from rest_framework.response import Response # built into the decorator
-from rest_framework import status, permissions
-from django.shortcuts import get_object_or_404 # great shortcut
+from rest_framework.views import APIView  # class views
+from rest_framework.decorators import api_view  # @decorator
+from rest_framework.response import Response  # built into the decorator
+from rest_framework import status, permissions, mixins, generics
+from django.shortcuts import get_object_or_404  # great shortcut
 
 # get user model
 from django.contrib.auth import get_user_model
@@ -16,7 +16,6 @@ from .serializers import BookSerializer
 # JWT auth
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
 
 # Create your views here.
 # JWT authorization views
@@ -28,10 +27,23 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.name
         return token
 
+''' this demontrates using mixins with generic views '''
 
-# ListApiView;  this could be rolled into the CreateApiView
+class BookList(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    def get(self, request):
+        return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+'''ListApiView;  this could be rolled into the CreateApiView'''
+
 class BookListApiView(APIView):
-    # permission_classes = [permissions.IsAuthenticated] # add permission to check if user is authenticated
+    permission_classes = [permissions.IsAuthenticated]  # add permission to check if user is authenticated
 
     # 1. List all books
     def get(self, request, *args, **kwargs):
@@ -57,7 +69,6 @@ class BookListApiView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 # BookDetailApiView
 class BookDetailApiView(APIView):
@@ -114,7 +125,6 @@ class BookDetailApiView(APIView):
             status=status.HTTP_200_OK
         )
 
-
 # standard controllers
 # @api_view(['GET'])
 # def index(request):
@@ -149,8 +159,6 @@ def api_search(request):
     print("title_results", title_results)
 
     return Response({'titleResults': title_results})
-
-
 
 # Timeboss
 # @api_view(['GET', 'POST'])
@@ -214,12 +222,7 @@ def api_search(request):
 #
 
 
-
-
-
-
 # left overs
 #     if month in monthlyChallenges:
 #         return JsonResponse({'challenge': monthlyChallenges[month]})
 #         return HttpResponse(f'Your challenge for {month} is: {monthlyChallenges[month]}')
-

@@ -26,7 +26,7 @@ class LibrarySerializer(serializers.ModelSerializer):
     # optional custom validators here
     class Meta:
         model = Library
-        fields = ['name', 'city', 'short', 'file']
+        fields = ['name', 'city', 'short', 'state']
 
 
 ''' simple jwt serializer which gets called in settings.py '''

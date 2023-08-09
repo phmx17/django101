@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class Library(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
+    state = models.CharField(max_length=50, null=True)
     short = models.CharField(max_length=4, unique=True)
     inventory = models.ForeignKey('Book', null=True, related_name='books', on_delete=models.PROTECT)
 
