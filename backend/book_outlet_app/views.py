@@ -40,6 +40,16 @@ class BookList(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateMode
     def post(self, request):
         return self.create(request)
 
+class BookSingle(generics.GenericAPIView, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    def get(self, request, **kwargs):
+        return self.retrieve(request)
+
+    def put(self, request, **kwargs):
+        return self.update(request)
+
 '''ListApiView;  this could be rolled into the CreateApiView'''
 
 class BookListApiView(APIView):
