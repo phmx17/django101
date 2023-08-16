@@ -24,11 +24,15 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
+    path('accounts/', include('book_outlet_app.auth_urls')), # using my own auth setup
+    # path('accounts/', include(('django.contrib.auth.urls', 'auth'), namespace='registration')),
+
     path("admin/", admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     # books api
-    path("api/books/", include('book_outlet_app.urls')),
+    path("api/books/", include('book_outlet_app.api_urls')),
     # path("challenges/", include('django101app.urls')),
+
     path('api/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

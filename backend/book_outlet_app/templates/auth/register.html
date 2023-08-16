@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% block title %}
+        <title>{{ title }}</title>
+    {% endblock %}
+    {% block cssImports %}
+{#        <link rel="stylesheet" href="{% static 'index.css' %}">#}
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+    <div class="container h-100">
+        <div class="d-flex justify-content-center h-100">
+            <div class="user_card bg-light p-4 ">
+                <h3 class="form-title" >REGISTER ACCOUNT</h3>
+                <form method="POST" action="" >
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        {{ form.username }}
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-envelope-square"></i></span>
+                        {{ form.email }}
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        {{ form.password1 }}
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        {{ form.password2 }}
+                    </div>
+                    <div class="input-group mb-3">
+                        {{ form.errors }}
+                    </div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="submit" class="btn btn-primary">Register Account</button>
+                    </div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <a href="{% url 'login' %}">Already Have an Account?</a>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+<script>
+    // the first element input is the csrf token, so start setting placeholders at element [1]
+    let formFields = document.getElementsByTagName('input')
+    formFields[1].placeholder = 'username'
+    formFields[2].placeholder = 'email'
+    formFields[3].placeholder = 'password'
+    formFields[4].placeholder = 'confirm password'
+    console.log('formFields element no 2: ', formFields[1])
+
+    for (let field in formFields) {
+        formFields[field].className += ' form-control'
+    }
+    console.log('formFields element no 2: ', formFields[1])
+</script>
+
+
+{% endblock %}
+
+</body>
+</html>

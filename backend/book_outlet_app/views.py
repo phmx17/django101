@@ -6,26 +6,80 @@ from rest_framework.views import APIView  # class views
 from rest_framework.decorators import api_view  # @decorator
 from rest_framework.response import Response  # built into the decorator
 from rest_framework import status, permissions, mixins, generics
-from django.shortcuts import get_object_or_404  # great shortcut
+from django.shortcuts import get_object_or_404, render, redirect  # 404 == great shortcut
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer  # JWT auth
 
-# get user model
-from django.contrib.auth import get_user_model
 from .models import Book
 from .serializers import BookSerializer
+from .forms import CreateUserForm
+from .decorators import unauthenticated_user
 
-# JWT auth
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
+''' JWT authorization views '''
 
-# Create your views here.
-# JWT authorization views
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
         # Add custom claims
-        token['username'] = user.name
+        token['username'] = user.name  # this is my custom entry into the token
         return token
+
+''' implementing my way of using local django to authenticate'''
+
+@unauthenticated_user
+def register(request):
+    template = 'auth/register.html'
+    form = CreateUserForm()  # initialize
+    # use same route to return post data
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():  # own serializer
+            form.save()
+            user = form.cleaned_data.get('username')
+            messages.success(request, f"Account created for {user}.")  # print success message
+            return redirect('login')
+    context = {'form': form}
+    return render(request, template, context)
+
+@unauthenticated_user
+def login_page(request):
+    template = 'auth/login.html'
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('test')
+        else:
+            messages.info(request, 'Incorrect username or password.')
+    context = {}
+    return render(request, template, context)
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
+
+@login_required(login_url='login') # immediate redirect if not authenticated
+def test(request):
+    template = 'auth/test.html'
+    title = "Movie Titles"
+    films = ['titanic', 'the abyss', 'the terminator']
+    context = {'title': title, 'films': films}
+    return render(request, template, context)
+
+''' this demontrates using generics which seem to be the simplest '''
+
+class GenericBookList(generics.ListCreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class GenericBookDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
 
 ''' this demontrates using mixins with generic views '''
 

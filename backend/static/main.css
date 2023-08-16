@@ -1,0 +1,12 @@
+
+h1 {
+    background-color: aquamarine;
+}
+
+.btn-primary {
+      background-color: #000;
+}
+
+.btn-primary:hover {
+      background-color: #555;
+}
