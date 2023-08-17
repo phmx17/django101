@@ -22,30 +22,27 @@
     <div class="container h-100">
         <div class="d-flex justify-content-center h-100">
             <div class="card bg-light p-4 ">
-                <h3 class="card-title" >LOGIN</h3>
+                <h3 class="card-title mx-auto " >HOME</h3>
                 <div class="card-body">
-                    <form method="POST" action="" >
-                        {% csrf_token %}
-                        <div class="input-group mb-3">
-                            <span class="input-group-text"><i class="fas fa-envelope-square"></i></span>
-                            <input type="text" name="username" placeholder="username" class="form-control"  />
-                        </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text"><i class="fas fa-key"></i></span>
-                            <input name="password" type="password" placeholder="password" class="form-control" />
-                        </div>
-                        <div class="input-group mb-3">
-                            {% for message in messages %}
-                                <p class="text-warning p-2 rounded" >{{ message }}</p>
-                            {% endfor %}
+                    <div>
+                        <div class="d-flex justify-content-center mt-4">
+                            {% if logged_in == False %}
+                            <a href="{% url 'login' %}"><button type="button" class="btn btn-primary">Login</button></a>
+                            {% endif %}
                         </div>
                         <div class="d-flex justify-content-center mt-4">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                            {% if logged_in == True %}
+                                <a href="{% url 'logout' %}"><button type="button" class="btn btn-primary">Logout</button></a>
+                            {% endif %}
                         </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <a href="{% url 'test' %}"><button type="button" class="btn btn-secondary">Test</button></a>
+                        </div>
+
                         <div class="d-flex justify-content-center mt-4">
                             <a href="{% url 'register' %}">Not Registered Yet?</a>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

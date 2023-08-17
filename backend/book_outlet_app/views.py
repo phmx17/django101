@@ -15,7 +15,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer  # JW
 from .models import Book
 from .serializers import BookSerializer
 from .forms import CreateUserForm
-from .decorators import unauthenticated_user
+from .decorators import unauthenticated_user, allowed_users
 
 ''' JWT authorization views '''
 
@@ -47,6 +47,7 @@ def register(request):
 @unauthenticated_user
 def login_page(request):
     template = 'auth/login.html'
+    title = "Login"
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -56,14 +57,16 @@ def login_page(request):
             return redirect('test')
         else:
             messages.info(request, 'Incorrect username or password.')
-    context = {}
+    context = {'title': title}
     return render(request, template, context)
 
 def logout_user(request):
     logout(request)
+    print("user logout. request.user: ", request.user)
     return redirect('login')
 
 @login_required(login_url='login') # immediate redirect if not authenticated
+@allowed_users(allowed_roles=['special'])
 def test(request):
     template = 'auth/test.html'
     title = "Movie Titles"
@@ -72,6 +75,22 @@ def test(request):
     return render(request, template, context)
 
 ''' this demontrates using generics which seem to be the simplest '''
+
+def home(request):
+    template = 'auth/home.html'
+    title = 'Home'
+    logged_in = False
+    if request.user.is_authenticated:
+        logged_in = True
+    context = {'title': title, 'logged_in': logged_in}
+    return render(request, template, context)
+
+def not_authorized(request):
+    template = 'auth/not_authorized.html'
+    title = "Not Authorized"
+    message = 'You are not authorized to view this page.'
+    context = {'title': title, 'message': message}
+    return render(request, template, context)
 
 class GenericBookList(generics.ListCreateAPIView):
     queryset = Book.objects.all()
